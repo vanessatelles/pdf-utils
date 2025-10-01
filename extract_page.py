@@ -28,3 +28,12 @@ def extrair_paginas_pdf(caminho_entrada, caminho_saida, paginas):
     print(f"Novo PDF salvo em: {caminho_saida}")
 
 
+if __name__ == "__main__":
+    # Exemplo de uso:
+    extrair_paginas_pdf(
+        "/content/DFS_001.PDF",
+        "/content/paginas_extraidas.pdf",
+        paginas_para_extrair
+    )
+
+    paginas_para_extrair = [1,2,3,4, 6, 9, 11, 14, 19, 32, 56, 86, 90, 94]  # base 1
