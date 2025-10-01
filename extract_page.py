@@ -37,3 +37,21 @@ if __name__ == "__main__":
     )
 
     paginas_para_extrair = [1,2,3,4, 6, 9, 11, 14, 19, 32, 56, 86, 90, 94]  # base 1
+
+    # Exemplo de uso 2:
+    paginas_para_extrair_2 = [
+        11, 14,
+        *range(18, 287),
+        *range(287, 299),
+        *range(302, 312),
+        *range(313, 316),
+        *range(317, 320),
+        *range(629, 774),
+        *range(775, 956)
+    ]
+
+    extrair_paginas_pdf(
+        "/content/KD7-001_B.pdf",
+        "/content/paginas_extraidas_2.pdf",
+        paginas_para_extrair_2
+    )
