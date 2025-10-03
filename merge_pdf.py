@@ -25,3 +25,17 @@ def merge_pdfs(file_list, output_path):
 
     print(f"PDFs merged successfully! Output saved to: {output_path}")
 
+if __name__ == "__main__":
+    # Example array of PDF files
+    pdf_files = [
+        "14.1_A_paginas_extraidas.pdf",
+        "15.1_B_paginas_extraidas.pdf",
+        "I_B_paginas_extraidas.pdf",
+        "I_001_paginas_extraidas.pdf"
+    ]
+
+    # Output path for the merged PDF
+    output_file = "merged_output.pdf"
+
+    # Merge the PDFs
+    merge_pdfs(pdf_files, output_file)
