@@ -41,3 +41,13 @@ def rotate_pdf_pages(input_pdf_path, pages_to_rotate, degrees, output_pdf_path=N
             pdf_writer.write(output_file)
 
     return output_pdf_path
+
+if __name__ == "__main__":
+    input_pdf = "14.1_A_paginas_extraidas.pdf"
+    pages_to_rotate = [1]  # Pages to rotate (1-based indexing)
+
+    try:
+        output_pdf = rotate_pdf_pages(input_pdf, pages_to_rotate, -90)
+        print(f"PDF successfully processed. Output saved to: {output_pdf}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
