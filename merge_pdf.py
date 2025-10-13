@@ -1,5 +1,6 @@
-from PyPDF2 import PdfMerger
+from PyPDF2 import PdfMerger, PdfReader
 import os
+import argparse
 
 def is_valid_pdf(file_path):
     """
@@ -59,16 +60,15 @@ def merge_pdfs(file_list, output_path):
     except Exception as e:
         print(f"Error saving merged PDF: {str(e)}")
 if __name__ == "__main__":
-    # Example array of PDF files
-    pdf_files = [
-        "14.1_A_paginas_extraidas.pdf",
-        "15.1_B_paginas_extraidas.pdf",
-        "I_B_paginas_extraidas.pdf",
-        "I_001_paginas_extraidas.pdf"
-    ]
+    parser = argparse.ArgumentParser(description="Mescla múltiplos PDFs em um único arquivo")
+    parser.add_argument(
+        "-i", "--inputs", nargs='+', required=True,
+        help="Lista de caminhos de PDFs a serem mesclados (ordem importa)"
+    )
+    parser.add_argument(
+        "-o", "--output", required=True,
+        help="Caminho do PDF de saída"
+    )
+    args = parser.parse_args()
 
-    # Output path for the merged PDF
-    output_file = "merged_output.pdf"
-
-    # Merge the PDFs
-    merge_pdfs(pdf_files, output_file)
+    merge_pdfs(args.inputs, args.output)
