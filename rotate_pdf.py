@@ -1,5 +1,7 @@
 import PyPDF2
 import os
+import argparse
+import sys
 
 def rotate_pdf_pages(input_pdf_path, pages_to_rotate, degrees, output_pdf_path=None):
     """
@@ -42,12 +44,62 @@ def rotate_pdf_pages(input_pdf_path, pages_to_rotate, degrees, output_pdf_path=N
 
     return output_pdf_path
 
-if __name__ == "__main__":
-    input_pdf = "14.1_A_paginas_extraidas.pdf"
-    pages_to_rotate = [1]  # Pages to rotate (1-based indexing)
+def parse_paginas(paginas_str):
+    paginas = []
+    if not paginas_str:
+        return paginas
+    for parte in paginas_str.split(','):
+        parte = parte.strip()
+        if not parte:
+            continue
+        if '-' in parte:
+            try:
+                inicio, fim = parte.split('-', 1)
+                inicio = int(inicio)
+                fim = int(fim)
+                if inicio <= fim:
+                    paginas.extend(list(range(inicio, fim + 1)))
+                else:
+                    paginas.extend(list(range(fim, inicio + 1)))
+            except ValueError:
+                print(f"Ignorando intervalo inválido: {parte}")
+        else:
+            try:
+                paginas.append(int(parte))
+            except ValueError:
+                print(f"Ignorando página inválida: {parte}")
+    # Remove duplicatas preservando ordem
+    seen = set()
+    paginas_unicas = []
+    for p in paginas:
+        if p not in seen:
+            paginas_unicas.append(p)
+            seen.add(p)
+    return paginas_unicas
 
-    try:
-        output_pdf = rotate_pdf_pages(input_pdf, pages_to_rotate, -90)
-        print(f"PDF successfully processed. Output saved to: {output_pdf}")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Rotaciona páginas específicas de um PDF")
+    parser.add_argument("-i", "--input", required=True, help="Caminho do PDF de entrada")
+    parser.add_argument("-o", "--output", required=False, help="Caminho do PDF de saída")
+    parser.add_argument(
+        "-p", "--paginas", required=True,
+        help="Páginas a rotacionar (ex: 1,2,5-8) - base 1"
+    )
+    parser.add_argument(
+        "-d", "--degrees", type=int, required=True,
+        help="Graus para rotacionar (positivos = horário, negativos = anti-horário), múltiplos de 90"
+    )
+    args = parser.parse_args()
+
+    if args.degrees % 90 != 0:
+        print("Graus deve ser múltiplo de 90.")
+        sys.exit(1)
+
+    paginas = parse_paginas(args.paginas)
+    if not paginas:
+        print("Nenhuma página válida informada.")
+        sys.exit(1)
+
+    output = rotate_pdf_pages(args.input, paginas, args.degrees, args.output)
+    print(f"PDF processado com sucesso. Salvo em: {output}")
