@@ -1,4 +1,6 @@
 from PyPDF2 import PdfReader, PdfWriter
+import argparse
+import sys
 
 def extrair_paginas_pdf(caminho_entrada, caminho_saida, paginas):
     """
@@ -28,30 +30,54 @@ def extrair_paginas_pdf(caminho_entrada, caminho_saida, paginas):
     print(f"Novo PDF salvo em: {caminho_saida}")
 
 
+def parse_paginas(paginas_str):
+    # Suporta formatos como "1,2,5-8,10"
+    paginas = []
+    if not paginas_str:
+        return paginas
+    for parte in paginas_str.split(','):
+        parte = parte.strip()
+        if not parte:
+            continue
+        if '-' in parte:
+            try:
+                inicio, fim = parte.split('-', 1)
+                inicio = int(inicio)
+                fim = int(fim)
+                if inicio <= fim:
+                    paginas.extend(list(range(inicio, fim + 1)))
+                else:
+                    paginas.extend(list(range(fim, inicio + 1)))
+            except ValueError:
+                print(f"Ignorando intervalo inválido: {parte}")
+        else:
+            try:
+                paginas.append(int(parte))
+            except ValueError:
+                print(f"Ignorando página inválida: {parte}")
+    # Remove duplicatas preservando ordem
+    seen = set()
+    paginas_unicas = []
+    for p in paginas:
+        if p not in seen:
+            paginas_unicas.append(p)
+            seen.add(p)
+    return paginas_unicas
+
+
 if __name__ == "__main__":
-    # Exemplo de uso:
-    extrair_paginas_pdf(
-        "/content/DFS_001.PDF",
-        "/content/paginas_extraidas.pdf",
-        paginas_para_extrair
+    parser = argparse.ArgumentParser(description="Extrai páginas específicas de um PDF")
+    parser.add_argument("-i", "--input", required=True, help="Caminho do PDF de entrada")
+    parser.add_argument("-o", "--output", required=True, help="Caminho do PDF de saída")
+    parser.add_argument(
+        "-p", "--paginas", required=True,
+        help="Páginas a extrair (ex: 1,2,5-8) - base 1"
     )
+    args = parser.parse_args()
 
-    paginas_para_extrair = [1,2,3,4, 6, 9, 11, 14, 19, 32, 56, 86, 90, 94]  # base 1
+    paginas = parse_paginas(args.paginas)
+    if not paginas:
+        print("Nenhuma página válida informada.")
+        sys.exit(1)
 
-    # Exemplo de uso 2:
-    paginas_para_extrair_2 = [
-        11, 14,
-        *range(18, 287),
-        *range(287, 299),
-        *range(302, 312),
-        *range(313, 316),
-        *range(317, 320),
-        *range(629, 774),
-        *range(775, 956)
-    ]
-
-    extrair_paginas_pdf(
-        "/content/KD7-001_B.pdf",
-        "/content/paginas_extraidas_2.pdf",
-        paginas_para_extrair_2
-    )
+    extrair_paginas_pdf(args.input, args.output, paginas)
